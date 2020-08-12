@@ -36,7 +36,7 @@ pipeline {
             unstash 'code'
             sh 'ci/build-app.sh'
             archiveArtifacts 'app/build/libs/'
-            stash 'code2'
+            stash(excludes: '.git', name: 'code2')
           }
         }
 
@@ -46,6 +46,9 @@ pipeline {
               image 'gradle:jdk11'
             }
 
+          }
+          options {
+            skipDefaultCheckout(true)
           }
           steps {
             unstash 'code'
@@ -58,6 +61,9 @@ pipeline {
     }
 
     stage('push docker app') {
+      when {
+        branch 'master'
+      }
       environment {
         DOCKERCREDS = credentials('docker_login')
       }
@@ -66,6 +72,12 @@ pipeline {
         sh 'ci/build-docker.sh'
         sh 'echo "$DOCKERCREDS_PSW" | docker login -u "$DOCKERCREDS_USR" --password-stdin'
         sh 'ci/push-docker.sh'
+      }
+    }
+
+    stage('test component') {
+      steps {
+        sh 'ci/component-test.sh'
       }
     }
 
