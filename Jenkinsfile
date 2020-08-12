@@ -15,7 +15,7 @@ pipeline {
 
       }
       steps {
-        stash(excludes: '/.git/', name: 'code')
+        stash(excludes: '.git', name: 'code')
       }
     }
 
