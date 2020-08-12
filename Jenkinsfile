@@ -62,6 +62,7 @@ pipeline {
 
     stage('push docker app') {
       when {
+        beforeAgent true
         branch 'master'
       }
       environment {
