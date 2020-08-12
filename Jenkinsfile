@@ -72,6 +72,6 @@ pipeline {
   }
   environment {
     DCREDS = credentials('docker_login')
-    docker_username = credentials('arkaria')
+    docker_username = 'arkaria'
   }
 }
