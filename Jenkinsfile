@@ -2,9 +2,6 @@ pipeline {
   agent any
   stages {
     stage('Docker login') {
-      environment {
-        DCREDS = credentials('docker_login')
-      }
       steps {
         sh 'echo "$DCREDS_PSW" | docker login -u "$DCREDS_USR" --password-stdin'
       }
@@ -46,6 +43,13 @@ pipeline {
           }
         }
 
+        stage('test app') {
+          steps {
+            sh 'ci/unit-test-app.sh'
+            sh 'junit \'app/build/test-results/test/TEST-*.xml\''
+          }
+        }
+
       }
     }
 
@@ -61,5 +65,8 @@ pipeline {
       }
     }
 
+  }
+  environment {
+    DCREDS = credentials('docker_login')
   }
 }
