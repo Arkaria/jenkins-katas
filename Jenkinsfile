@@ -33,8 +33,10 @@ pipeline {
             skipDefaultCheckout(true)
           }
           steps {
+            unstash 'code'
             sh 'ci/build-app.sh'
             archiveArtifacts 'app/build/libs/'
+            stash 'code2'
           }
         }
 
@@ -49,7 +51,6 @@ pipeline {
             unstash 'code'
             sh 'ci/unit-test-app.sh'
             junit 'junit \'app/build/test-results/test/TEST-*.xml\''
-            stash 'code'
           }
         }
 
@@ -61,7 +62,7 @@ pipeline {
         DOCKERCREDS = credentials('docker_login')
       }
       steps {
-        unstash 'code'
+        unstash 'code2'
         sh 'ci/build-docker.sh'
         sh 'echo "$DOCKERCREDS_PSW" | docker login -u "$DOCKERCREDS_USR" --password-stdin'
         sh 'ci/push-docker.sh'
